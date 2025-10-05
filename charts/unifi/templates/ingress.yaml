@@ -22,11 +22,11 @@ metadata:
     # # NGINX Ingress Controller annotations
     # nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
     # {{- else if contains "traefik" (.Values.ingress.className | lower) }}
-    # # Traefik annotations
-    # traefik.ingress.kubernetes.io/router.entrypoints: websecure
-    # traefik.ingress.kubernetes.io/router.tls: "true"
-    # traefik.ingress.kubernetes.io/service.serversscheme: https
-    # traefik.ingress.kubernetes.io/service.serverstransport: unifi-transport
+    # Traefik annotations
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    traefik.ingress.kubernetes.io/router.tls: "true"
+    traefik.ingress.kubernetes.io/service.serversscheme: https
+    traefik.ingress.kubernetes.io/service.serverstransport: unifi-transport
     # {{- else if or (contains "alb" (.Values.ingress.className | lower)) (contains "aws-load-balancer" (.Values.ingress.className | lower)) }}
     # # AWS Load Balancer Controller annotations
     # alb.ingress.kubernetes.io/backend-protocol: HTTPS
@@ -41,8 +41,6 @@ metadata:
     # {{- with .Values.ingress.annotations }}
     # {{- toYaml . | nindent 4 }}
     # {{- end }}
-    traefik.ingress.kubernetes.io/router.entrypoints: websecure
-    traefik.ingress.kubernetes.io/router.tls: 'true'
     traefik.ingress.kubernetes.io/router.tls.certresolver: vault
 spec:
   {{- if and .Values.ingress.className (semverCompare ">=1.18-0" .Capabilities.KubeVersion.GitVersion) }}
@@ -76,7 +74,7 @@ spec:
                   number: {{ $svcPort }}
               {{- else }}
               serviceName: {{ $fullName }}
-              servicePort: 8080 # {{ $svcPort }}
+              servicePort: {{ $svcPort }}
               {{- end }}
           {{- end }}
     {{- end }}
