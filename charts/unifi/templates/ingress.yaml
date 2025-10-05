@@ -17,30 +17,33 @@ metadata:
   labels:
     {{- include "unifi.labels" . | nindent 4 }}
   annotations:
-    # UniFi uses HTTPS on backend port 8443 with self-signed certificates
-    {{- if or (contains "nginx" (.Values.ingress.className | lower)) (hasKey .Values.ingress.annotations "kubernetes.io/ingress.class") }}
-    # NGINX Ingress Controller annotations
-    nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
-    {{- else if contains "traefik" (.Values.ingress.className | lower) }}
-    # Traefik annotations
+    # # UniFi uses HTTPS on backend port 8443 with self-signed certificates
+    # {{- if or (contains "nginx" (.Values.ingress.className | lower)) (hasKey .Values.ingress.annotations "kubernetes.io/ingress.class") }}
+    # # NGINX Ingress Controller annotations
+    # nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+    # {{- else if contains "traefik" (.Values.ingress.className | lower) }}
+    # # Traefik annotations
+    # traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    # traefik.ingress.kubernetes.io/router.tls: "true"
+    # traefik.ingress.kubernetes.io/service.serversscheme: https
+    # traefik.ingress.kubernetes.io/service.serverstransport: unifi-transport
+    # {{- else if or (contains "alb" (.Values.ingress.className | lower)) (contains "aws-load-balancer" (.Values.ingress.className | lower)) }}
+    # # AWS Load Balancer Controller annotations
+    # alb.ingress.kubernetes.io/backend-protocol: HTTPS
+    # alb.ingress.kubernetes.io/healthcheck-protocol: HTTPS
+    # alb.ingress.kubernetes.io/ssl-policy: ELBSecurityPolicy-TLS-1-2-2017-01
+    # {{- else if contains "gce" (.Values.ingress.className | lower) }}
+    # # Google Cloud Load Balancer annotations
+    # kubernetes.io/ingress.global-static-ip-name: unifi-ip
+    # networking.gke.io/load-balancer-type: "External"
+    # cloud.google.com/backend-config: '{"ports": {"8443":"unifi-backend-config"}}'
+    # {{- end }}
+    # {{- with .Values.ingress.annotations }}
+    # {{- toYaml . | nindent 4 }}
+    # {{- end }}
     traefik.ingress.kubernetes.io/router.entrypoints: websecure
-    traefik.ingress.kubernetes.io/router.tls: "true"
-    traefik.ingress.kubernetes.io/service.serversscheme: https
-    traefik.ingress.kubernetes.io/service.serverstransport: unifi-transport
-    {{- else if or (contains "alb" (.Values.ingress.className | lower)) (contains "aws-load-balancer" (.Values.ingress.className | lower)) }}
-    # AWS Load Balancer Controller annotations
-    alb.ingress.kubernetes.io/backend-protocol: HTTPS
-    alb.ingress.kubernetes.io/healthcheck-protocol: HTTPS
-    alb.ingress.kubernetes.io/ssl-policy: ELBSecurityPolicy-TLS-1-2-2017-01
-    {{- else if contains "gce" (.Values.ingress.className | lower) }}
-    # Google Cloud Load Balancer annotations
-    kubernetes.io/ingress.global-static-ip-name: unifi-ip
-    networking.gke.io/load-balancer-type: "External"
-    cloud.google.com/backend-config: '{"ports": {"8443":"unifi-backend-config"}}'
-    {{- end }}
-    {{- with .Values.ingress.annotations }}
-    {{- toYaml . | nindent 4 }}
-    {{- end }}
+    traefik.ingress.kubernetes.io/router.tls: 'true'
+    traefik.ingress.kubernetes.io/router.tls.certresolver: vault
 spec:
   {{- if and .Values.ingress.className (semverCompare ">=1.18-0" .Capabilities.KubeVersion.GitVersion) }}
   ingressClassName: {{ .Values.ingress.className }}
@@ -73,7 +76,7 @@ spec:
                   number: {{ $svcPort }}
               {{- else }}
               serviceName: {{ $fullName }}
-              servicePort: {{ $svcPort }}
+              servicePort: 8080 # {{ $svcPort }}
               {{- end }}
           {{- end }}
     {{- end }}
