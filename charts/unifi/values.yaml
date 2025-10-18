@@ -53,6 +53,7 @@ service:
   httpPortal: 8880        # HTTP portal (optional)
   speedtest: 6789         # Speed Test (unifi5 only) (optional)
   discovery: 10001        # Device discovery (optional)
+  annotations: {}
 
 ingress:
   enabled: false
