@@ -254,6 +254,9 @@ mongodb:
           ]
         })
         EOF
+  image:
+    repository: bitnamilegacy/mongodb
+    tag: 8.0.13
 
 # External Database configuration
 # Use this when connecting to an existing MongoDB instance
