@@ -17,6 +17,6 @@ maintainers:
     email: me@hanlee.co
 dependencies:
   - name: mongodb
-    version: "17.0.1"
-    repository: "oci://registry-1.docker.io/bitnamicharts"
+    version: "16.5.45"
+    repository: "oci://registry-1.docker.io/bitnamilegacy"
     condition: mongodb.enabled
